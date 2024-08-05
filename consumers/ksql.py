@@ -12,21 +12,19 @@ logger = logging.getLogger(__name__)
 
 KSQL_URL = "http://localhost:8088"
 
-
 KSQL_STATEMENT = """
 CREATE TABLE turnstile (
     station_id INT,
     station_name VARCHAR,
     line VARCHAR
 ) WITH (
-    KAFKA_TOPIC='raw_turnstile',
-    VALUE_FORMAT='AVRO',
-    KEY='station_id'
+    kafka_topic = 'org.chicago.cta.station.turnstile.v1',
+    value_format = 'avro',
+    key = 'station_id'
 );
-
 CREATE TABLE turnstile_summary
-WITH (VALUE_FORMAT='JSON') AS
-    SELECT station_id, COUNT(*) AS count
+WITH (value_format = 'json') AS
+    SELECT station_id, COUNT(station_id) AS count
     FROM turnstile
     GROUP BY station_id;
 """
@@ -50,7 +48,6 @@ def execute_statement():
         ),
     )
 
-    # Ensure that a 2XX status code was returned
     resp.raise_for_status()
 
 
